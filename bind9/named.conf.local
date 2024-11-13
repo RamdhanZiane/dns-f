@@ -1,4 +1,5 @@
-include "/etc/bind/rndc.key";
+// Removed the following line as rndc.key is already included in named.conf
+// include "/etc/bind/rndc.key";
 
 zone "." {
     type hint;
