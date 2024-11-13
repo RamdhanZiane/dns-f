@@ -15,4 +15,4 @@ COPY manage_dns.py .
 RUN chmod +x wait-for-it.sh
 
 # Use wait-for-it.sh to wait for PostgreSQL before starting the application
-CMD ["./wait-for-it.sh", "postgres:5432", "--", "python", "manage_dns.py"]
+CMD ["python", "manage_dns.py"]
