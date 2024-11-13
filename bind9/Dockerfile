@@ -11,11 +11,8 @@ RUN apt-get update && \
 # Set working directory
 WORKDIR /app
 
-# Copy the manage_dns.py script into the container
-COPY ../manager/manage_dns.py /app/manage_dns.py
+COPY . /app/
 
-# Copy wait-for-it.sh script
-COPY ../manager/wait-for-it.sh /app/wait-for-it.sh
 RUN chmod +x /app/wait-for-it.sh
 
 # Install Python dependencies
