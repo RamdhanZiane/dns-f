@@ -1,0 +1,9 @@
+zone "." {
+    type hint;
+    file "/etc/bind/zones/db.root";
+};
+
+zone "example.com" {
+    type master;
+    file "/etc/bind/zones/db.example.com";
+};
