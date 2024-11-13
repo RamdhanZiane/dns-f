@@ -133,7 +133,7 @@ def request_ssl_certificate(domain):
         }
     }
     try:
-        # Corrected API endpoint to avoid duplicate /v2
+        # Corrected API endpoint to prevent duplication of /v2
         response = requests.post(f"{NPM_API_URL}/certificates", json=data, headers=headers)
         if response.status_code == 201:
             logging.info(f"SSL certificate requested for {domain}")
