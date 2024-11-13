@@ -4,15 +4,15 @@ WORKDIR /app
 
 COPY . .
 
-# Install netcat-openbsd for wait-for-it.sh and clean up apt lists
+# Install netcat-openbsd for wait-for-it.sh (if you decide to use it later) and clean up apt lists
 RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY manage_dns.py .
 
-# Ensure the wait-for-it.sh script is executable
+# Ensure the wait-for-it.sh script is executable (if using)
 RUN chmod +x wait-for-it.sh
 
-# Use wait-for-it.sh to wait for PostgreSQL before starting the application
+# Use wait-for-it.sh to wait for PostgreSQL before starting the application (if using)
 CMD ["python", "manage_dns.py"]
