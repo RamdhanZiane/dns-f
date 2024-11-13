@@ -30,7 +30,7 @@ COPY . /app/
 # Ensure wait-for-it.sh is executable
 RUN chmod +x /app/wait-for-it.sh
 
-# Install Python dependencies via apt, so remove pip install step
+# Remove pip install step since packages are installed via apt
 # RUN pip3 install --no-cache-dir psycopg2-binary requests
 
 # Copy the entrypoint script
