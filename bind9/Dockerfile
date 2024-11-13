@@ -6,9 +6,6 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Install BIND9, Python, and necessary utilities
 RUN apt-get update && \
     apt-get install -y \
-    bind9 \
-    bind9utils \
-    bind9-doc \
     python3 \
     python3-pip \
     python3-psycopg2 \
@@ -26,7 +23,7 @@ WORKDIR /app
 COPY . /app/
 
 # Ensure wait-for-it.sh is executable
-RUN chmod +x /app/wait-for-it.sh
+# RUN chmod +x /app/wait-for-it.sh
 
 # Remove pip install step since packages are installed via apt
 # RUN pip3 install --no-cache-dir psycopg2-binary requests
