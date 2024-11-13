@@ -16,7 +16,7 @@ services:
       dns_network:
         ipv4_address: 172.18.0.2
     environment:
-      - RNDC_KEY=/etc/bind/rndc.key
+      - RNDC_KEY=/etc/bind/rndc.key  # Can be removed if not used elsewhere
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=dnsdb
