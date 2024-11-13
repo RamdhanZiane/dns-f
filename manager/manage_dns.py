@@ -155,7 +155,7 @@ def main():
         domains = get_new_domains()
         if domains:
             update_bind(domains)
-        time.sleep(600)  # Wait for 10 minutes
+        time.sleep(3)  # Wait for 3 seconds instead of 600
 
 if __name__ == "__main__":
     main()
