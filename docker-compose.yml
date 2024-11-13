@@ -2,21 +2,28 @@ version: '3.8'
 
 services:
   bind9:
-    image: ubuntu/bind9:latest
+    build:
+      context: ./bind9
+      dockerfile: Dockerfile
     container_name: bind9
     volumes:
       - ./bind9:/etc/bind
-      - ./bind9/rndc.key:/etc/bind/rndc.key  # Mounted rndc key
-      - ./bind9/zones:/etc/bind/zones       # Mounted zones directory
+      - ./bind9/zones:/etc/bind/zones  # Mounted zones directory
     ports:
       - "53:53/tcp"
       - "53:53/udp"
     networks:
       dns_network:
         ipv4_address: 172.18.0.2
-    command: /usr/sbin/named -f -c /etc/bind/named.conf -u bind
     environment:
       - RNDC_KEY=/etc/bind/rndc.key
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=dnsdb
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - NPM_API_URL=http://nginx-proxy-manager:81/api
+      - NPM_API_KEY=your_valid_api_key_here
 
   nginx-proxy-manager:
     image: jc21/nginx-proxy-manager:latest
@@ -43,25 +50,6 @@ services:
     networks:
       dns_network:
         ipv4_address: 172.18.0.4
-
-  dns_manager:
-    build: ./manager
-    container_name: dns_manager
-    env_file:
-      - .env
-    volumes:
-      - ./manager:/app
-      - ./bind9/rndc.key:/etc/bind/rndc.key  # Access rndc key if needed
-      - ./bind9/zones:/etc/bind/zones       # Mount zones directory
-      - ./manager/wait-for-it.sh:/wait-for-it.sh  # Mount wait-for-it.sh
-    depends_on:
-      - postgres
-      - bind9
-      - nginx-proxy-manager
-    networks:
-      dns_network:
-        ipv4_address: 172.18.0.5
-    command: ["./wait-for-it.sh", "postgres:5432", "--", "python", "manage_dns.py"]
 
 networks:
   dns_network:
