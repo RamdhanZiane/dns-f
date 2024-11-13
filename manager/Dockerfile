@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN apt-get update 
-# && apt-get install -y netcat && rm -rf /var/lib/apt/lists/*
+# Install netcat-openbsd for wait-for-it.sh and clean up apt lists
+RUN apt-get update && apt-get install -y netcat-openbsd && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir -r requirements.txt
 
