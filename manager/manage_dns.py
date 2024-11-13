@@ -19,19 +19,28 @@ DB_PASSWORD = os.getenv('POSTGRES_PASSWORD', 'password')
 NPM_API_URL = os.getenv('NPM_API_URL', 'http://nginx-proxy-manager:81/api')
 NPM_API_KEY = os.getenv('NPM_API_KEY', 'your_api_key_here')
 
-def get_db_connection():
-    try:
-        conn = psycopg2.connect(
-            host=DB_HOST,
-            port=DB_PORT,
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
-        )
-        return conn
-    except Exception as e:
-        logging.error(f"Database connection failed: {e}")
-        return None
+def get_db_connection(retries=5, delay=5):
+    attempt = 0
+    while attempt < retries:
+        try:
+            conn = psycopg2.connect(
+                host=DB_HOST,
+                port=DB_PORT,
+                dbname=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+            )
+            logging.info("Successfully connected to the database.")
+            return conn
+        except Exception as e:
+            attempt += 1
+            logging.error(f"Database connection failed (Attempt {attempt}/{retries}): {e}")
+            if attempt < retries:
+                logging.info(f"Retrying in {delay} seconds...")
+                time.sleep(delay)
+            else:
+                logging.error("Max retries reached. Exiting.")
+                return None
 
 def get_new_domains():
     conn = get_db_connection()
@@ -139,11 +148,14 @@ def update_bind(domains):
         mark_domain_as_processed(domain_info['domain'])
 
 def main():
+    initial_delay = 10  # Initial delay to allow services to start
+    logging.info(f"Initial delay of {initial_delay} seconds to allow services to start.")
+    time.sleep(initial_delay)
     while True:
         domains = get_new_domains()
         if domains:
             update_bind(domains)
-        time.sleep(3)  # Wait for 10 minutes
+        time.sleep(600)  # Wait for 10 minutes
 
 if __name__ == "__main__":
     main()
