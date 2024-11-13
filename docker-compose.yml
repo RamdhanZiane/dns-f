@@ -52,6 +52,7 @@ services:
     volumes:
       - ./manager:/app
       - ./bind9/rndc.key:/etc/bind/rndc.key  # Access rndc key if needed
+      - ./bind9/zones:/etc/bind/zones       # Mount zones directory
     depends_on:
       - postgres
       - bind9

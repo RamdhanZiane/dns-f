@@ -18,3 +18,6 @@ COPY manage_dns.py .
 
 # Use wait-for-it.sh to wait for PostgreSQL before starting the application (if using)
 CMD ["python", "manage_dns.py"]
+
+# Mount zones directory
+VOLUME ["/etc/bind/zones"]
