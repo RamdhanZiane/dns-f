@@ -16,6 +16,11 @@ RUN apt-get update && \
     netcat-openbsd && \
     rm -rf /var/lib/apt/lists/*
 
+# Generate rndc.key
+RUN rndc-confgen -a -c /etc/bind/rndc.key && \
+    chown bind:bind /etc/bind/rndc.key && \
+    chmod 600 /etc/bind/rndc.key
+
 # Set working directory
 WORKDIR /app
 
