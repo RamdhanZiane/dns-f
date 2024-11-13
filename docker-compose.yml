@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   bind9:
+    image: ubuntu/bind9:latest
     build:
       context: ./bind9
       dockerfile: Dockerfile

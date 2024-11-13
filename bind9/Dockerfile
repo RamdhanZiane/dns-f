@@ -14,7 +14,10 @@ RUN apt-get update && \
     python3-psycopg2 \
     python3-requests \
     netcat-openbsd && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* \
+    net-tools \
+    iputils-ping \
+    dnsutils
 
 # Set working directory
 WORKDIR /app
