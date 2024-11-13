@@ -140,6 +140,7 @@ def update_bind(domains):
     reload_bind()
 
 def main():
+    time.sleep(5)
     while True:
         domains = get_new_domains()
         if domains:
