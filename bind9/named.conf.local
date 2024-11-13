@@ -1,6 +1,3 @@
-// Configure rndc
-include "/etc/bind/rndc.key";
-
 zone "." {
     type hint;
     file "/etc/bind/zones/db.root";
