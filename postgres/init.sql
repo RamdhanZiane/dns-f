@@ -1,4 +1,4 @@
-CREATE TABLE domains (
+CREATE TABLE IF NOT EXISTS domains (
     id SERIAL PRIMARY KEY,
     domain VARCHAR(255) NOT NULL UNIQUE,
     ip_address VARCHAR(45) NOT NULL,
@@ -10,6 +10,6 @@ CREATE TABLE domains (
     last_error TEXT
 );
 
-CREATE INDEX idx_unprocessed_domains ON domains (is_processed)
+CREATE INDEX IF NOT EXISTS idx_unprocessed_domains ON domains (is_processed)
 WHERE
     NOT is_processed;
