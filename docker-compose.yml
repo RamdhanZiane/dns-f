@@ -20,7 +20,7 @@ services:
       - ./nginx/letsencrypt:/etc/letsencrypt
 
   postgres:
-    image: postgres:13
+    image: postgres:latest
     container_name: postgres
     env_file:
       - .env
