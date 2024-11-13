@@ -11,10 +11,10 @@ echo "Waiting for PostgreSQL to be ready..."
 
 # Start the DNS manager Python script
 echo "Starting DNS Manager..."
-python3 /app/manage_dns.py &
+python3 /app/manage_dns.py 
 
-# Wait indefinitely to keep the container running
-wait -n
+# # Wait indefinitely to keep the container running
+# wait -n
 
-# Exit with the status of the first process that exited
-exit $?
+# # Exit with the status of the first process that exited
+# exit $?
