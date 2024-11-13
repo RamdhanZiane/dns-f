@@ -1,6 +1,6 @@
 services:
   bind9:
-    image: internetsystemsconsortium/bind9:latest
+    image: ubuntu/bind9:latest
     container_name: bind9
     volumes:
       - ./bind9:/etc/bind
