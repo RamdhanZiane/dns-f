@@ -1,10 +1,9 @@
 import time
 import psycopg2
-import dns.update
-import dns.query
 import os
 import requests
 import logging
+import subprocess  # Added for executing rndc commands
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s:%(message)s')
@@ -62,13 +61,14 @@ def mark_domain_as_processed(domain):
     finally:
         conn.close()
 
-def create_zone_file(domain_info):
+def add_zone_with_rndc(domain_info):
     domain = domain_info['domain']
     ip_address = domain_info['ip_address']
-    zone_path = f"/etc/bind/zones/db.{domain}"
-    try:
-        with open(zone_path, 'w') as zone_file:
-            zone_file.write(f"""$TTL    604800
+    zone_name = domain
+    zone_file = f"/etc/bind/zones/db.{domain}"
+
+    # Create zone file content
+    zone_content = f"""$TTL    604800
 @       IN      SOA     ns1.{domain}. admin.{domain}. (
                               2         ; Serial
                          604800         ; Refresh
@@ -79,31 +79,32 @@ def create_zone_file(domain_info):
 @       IN      NS      ns1.{domain}.
 @       IN      A       {ip_address}
 www     IN      CNAME   {domain}.
-""")
+"""
+
+    try:
+        # Write zone file
+        with open(zone_file, 'w') as zf:
+            zf.write(zone_content)
         logging.info(f"Zone file created for {domain}")
-    except Exception as e:
-        logging.error(f"Error creating zone file for {domain}: {e}")
 
-def update_bind_conf(domain):
-    conf_path = "/etc/bind/named.conf.local"
-    try:
-        with open(conf_path, 'a') as conf_file:
-            conf_file.write(f"""
-zone "{domain}" {{
-    type master;
-    file "/etc/bind/zones/db.{domain}";
-}};
-""")
-        logging.info(f"named.conf.local updated for {domain}")
-    except Exception as e:
-        logging.error(f"Error updating named.conf.local for {domain}: {e}")
+        # Add zone using rndc
+        add_zone_cmd = [
+            'rndc', 'addzone',
+            zone_name,
+            f'type master; file "{zone_file}";'
+        ]
+        subprocess.run(add_zone_cmd, check=True)
+        logging.info(f"Zone {domain} added via rndc")
 
-def reload_bind():
-    try:
-        dns.query.tcp('localhost', 53)  # Example command to reload BIND
-        logging.info("BIND9 reloaded successfully")
+        # Reload BIND9 to apply changes
+        reload_bind_cmd = ['rndc', 'reload']
+        subprocess.run(reload_bind_cmd, check=True)
+        logging.info("BIND9 reloaded successfully via rndc")
+
+    except subprocess.CalledProcessError as e:
+        logging.error(f"rndc command failed: {e}")
     except Exception as e:
-        logging.error(f"Error reloading BIND9: {e}")
+        logging.error(f"Error adding zone with rndc for {domain}: {e}")
 
 def request_ssl_certificate(domain):
     headers = {
@@ -133,14 +134,11 @@ def request_ssl_certificate(domain):
 
 def update_bind(domains):
     for domain_info in domains:
-        create_zone_file(domain_info)
-        update_bind_conf(domain_info['domain'])
+        add_zone_with_rndc(domain_info)
         request_ssl_certificate(domain_info['domain'])
         mark_domain_as_processed(domain_info['domain'])
-    reload_bind()
 
 def main():
-    time.sleep(5)
     while True:
         domains = get_new_domains()
         if domains:
